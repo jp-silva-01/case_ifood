@@ -1,0 +1,25 @@
+# --- Core ETL ---
+duckdb>=0.9.0
+pandas>=2.0.0
+kagglehub>=0.2.0
+
+# --- Data Quality ---
+pandera>=0.17.0
+# scipy nao vem junto com o pandera; e usado no teste de normalidade dos
+# validators e no qui-quadrado dos notebooks. Sem ele o ETL quebra.
+scipy>=1.11.0
+
+# --- Testes Automatizados ---
+pytest>=7.0.0
+
+# --- Data Storytelling ---
+notebook
+ipykernel<7
+matplotlib
+seaborn
+
+# --- Inteligência Artificial ---
+google-genai
+python-dotenv
+# schemas de Structured Output; hoje chega como transitiva, declarado por seguranca
+pydantic>=2.0.0
