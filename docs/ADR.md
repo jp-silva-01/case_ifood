@@ -42,7 +42,11 @@ Este documento registra as decisões de arquitetura e modelagem tomadas na const
 **Alternativas consideradas.** Fato única com todos os grãos — descartada: multiplicaria linhas e duplicaria `SUM(price)`/`SUM(payment_value)`.
 Desempate de avaliações por `MAX(review_score)` + `FIRST(comentário)` — descartado: `FIRST()` sem `ORDER BY` não é determinístico no DuckDB, e `MAX()` enviesa a satisfação para cima, subestimando detratores (a população que alimenta o módulo de IA).
 
-**Consequência.** Sem a propagação do filtro, 542 itens e 664 pagamentos ficariam órfãos (R$ 95 mil de GMV cancelado entrando em qualquer consulta direta sobre `fato_itens`), violando a relação identificante do ERD. Cada análise usa a fato correta por grão: receita e produto em `fato_itens`, parcelamento em `fato_pagamentos`, ciclo de entrega e satisfação em `fato_pedidos`. O trade-off é que qualquer nova fato precisa repetir explicitamente a propagação do filtro — a suíte de testes (`test_integridade_referencial_das_fatos`, `test_grao_da_fato_pedidos`) existe para travar essa regressão.
+**Consequência.** Sem a propagação do filtro, 542 itens e 664 pagamentos ficariam órfãos (R$ 95 mil de GMV cancelado entrando em qualquer consulta direta sobre `fato_itens`), violando a relação identificante do ERD. Cada análise usa a fato correta por grão:
+> receita e produto em `fato_itens`
+> parcelamento em `fato_pagamentos`
+> ciclo de entrega e satisfação em `fato_pedidos`.
+O trade-off é que qualquer nova fato precisa repetir explicitamente a propagação do filtro — a suíte de testes (`test_integridade_referencial_das_fatos`, `test_grao_da_fato_pedidos`) existe para travar essa regressão.
 
 ---
 
@@ -52,11 +56,11 @@ Desempate de avaliações por `MAX(review_score)` + `FIRST(comentário)` — des
 
 **Contexto.** O case exige verificação automatizada com relatório claro (pass/fail) e no mínimo 5 checagens. Interromper a esteira a cada violação isolada (um preço negativo, uma chave estrangeira órfã) não é viável para um pipeline de mais de 100 mil transações.
 
-**Decisão.** Schemas Pandera (`DataFrameModel`) tipados para as 7 entidades, cobrindo tipo, nulidade, unicidade de chave, regra temporal (`delivered >= purchase`) e regra de domínio (boleto exige parcela única), somados a checagem de integridade referencial em 6 relacionamentos. Política de soft-fail: linhas violadoras e órfãs são movidas para `data/quarantine/` com a coluna `quarantine_reason`; a esteira nunca é interrompida. `data_quality_report.md` é emitido a cada execução com confiabilidade (%) por verificação.
+**Decisão.** Schemas Pandera (`DataFrameModel`) tipados para as 7 entidades, cobrindo tipo, nulidade, unicidade de chave, regra temporal (`delivered >= purchase`), somados a checagem de integridade referencial em 6 relacionamentos. Política de soft-fail: linhas violadoras e órfãs são movidas para `data/quarantine/` com a coluna `quarantine_reason`; a esteira nunca é interrompida. `data_quality_report.md` é emitido a cada execução com confiabilidade (%) por verificação.
 
 **Alternativas consideradas.** Hard-fail (abortar no primeiro erro) — descartado: inviabiliza a continuidade analítica em um dataset desse volume e não reflete como uma ingestão real precisa se comportar.
 
-**Consequência.** 13/13 verificações aprovadas com 100% de confiabilidade no dataset atual: a base pública da Olist não viola nenhuma das regras testadas, então `data/quarantine/` fica vazia numa execução normal. O mecanismo de segregação é exercitado em `tests/test_dq.py`, que injeta uma chave duplicada sintética e verifica que o arquivo de quarentena é escrito. O trade-off do soft-fail é exigir vigilância: dado descartado silenciosamente é um risco, por isso o relatório é gerado a cada rodada em vez de sob demanda.
+**Consequência.** 13/13 verificações aprovadas com 100% de confiabilidade no dataset atual: a base pública da Olist não viola nenhuma das regras testadas, então `data/quarantine/` fica vazia numa execução normal. O trade-off do soft-fail é exigir vigilância: dado descartado silenciosamente é um risco, por isso o relatório é gerado a cada rodada em vez de sob demanda.
 
 ---
 

@@ -1,0 +1,23 @@
+## Arquivo de variáveis de ambiente.
+.env
+
+## Diretório de dados carregados e processados.
+# Os CSVs (raw/staging/quarantine) sao regeraveis pelo pipeline e ficam de fora.
+# O DW em data/processed/olist.duckdb e versionado de proposito: se houver
+# limitacao de rede, de credencial do Kaggle ou de cota da API de IA, o avaliador
+# consegue abrir os notebooks e reproduzir as analises sem rodar a ingestao.
+#
+# Atencao: o Git nao reinclui um arquivo cujo diretorio-pai foi excluido, entao
+# nao basta "data/*" + "!data/processed/*" -- e preciso reabrir o diretorio antes.
+data/*
+!data/processed/
+data/processed/*
+!data/processed/olist.duckdb
+
+## Caches gerados automaticamente pela execução dos scripts.
+*cache/
+__pycache__/
+
+.*
+
+!.gitignore
