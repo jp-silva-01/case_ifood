@@ -61,7 +61,7 @@ def test_primary_keys_not_null():
 
 def test_grao_da_fato_pedidos():
     """
-    Garante o grão declarado na ADR 002: 1 linha = 1 pedido.
+    Garante o grão declarado na ADR-02: 1 linha = 1 pedido.
 
     É a propriedade que a deduplicação de avaliações pode quebrar -- os pedidos com mais de
     uma avaliação multiplicariam linhas aqui se o desempate falhar.

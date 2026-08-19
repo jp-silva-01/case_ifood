@@ -50,9 +50,9 @@ FROM generate_series(DATE '2016-01-01', DATE '2019-12-31', INTERVAL 1 DAY) t(d);
 
 -- 2. Tabela Fato: Pedidos (nivel de cabecalho / entregas e avaliacoes)
 -- As avaliacoes sao consolidadas antes do join para garantir 1:1 e evitar o fan-out
--- discutido na ADR 002. Ha 551 pedidos com mais de uma avaliacao e 202 com notas
+-- discutido na ADR-02. Ha 551 pedidos com mais de uma avaliacao e 202 com notas
 -- divergentes: prevalece a mais recente, e a linha inteira e selecionada de uma vez para
--- que nota e comentario venham sempre do mesmo registro (ADR 014).
+-- que nota e comentario venham sempre do mesmo registro (ADR-02).
 CREATE OR REPLACE TABLE fato_pedidos AS
 WITH order_reviews AS (
     SELECT order_id, review_score, review_comment_message
@@ -79,7 +79,7 @@ SELECT
     o.order_estimated_delivery_date::TIMESTAMP AS estimated_delivery_timestamp,
     -- Metricas de prazo derivadas aqui, uma vez, em vez de repetidas em cada consulta.
     -- Pedido sem data de entrega resulta em NULL, que nao satisfaz atrasou = TRUE nem
-    -- atrasou = FALSE: sai de toda metrica de prazo por construcao (ADR 014).
+    -- atrasou = FALSE: sai de toda metrica de prazo por construcao (ADR-02).
     DATE_DIFF('day', o.order_purchase_timestamp, o.order_delivered_customer_date) AS prazo_entrega_dias,
     CASE
         WHEN o.order_delivered_customer_date IS NULL THEN NULL
@@ -105,7 +105,7 @@ SELECT
     i.price,
     i.freight_value,
     -- Sinalizado pela suite de DQ, nao descartado: analises que precisem de robustez a
-    -- extremos filtram por aqui e o GMV total permanece integro (ADR 007).
+    -- extremos filtram por aqui e o GMV total permanece integro (ADR-04).
     i.is_price_outlier
 FROM read_csv_auto('data/staging/olist_order_items_dataset.csv') i
 WHERE EXISTS (SELECT 1 FROM fato_pedidos p WHERE p.order_id = i.order_id);

@@ -1,7 +1,7 @@
 """
 Módulo de Inteligência Artificial e Enriquecimento Semântico (NLP & Data Warehouse)
 
-Implementa pipeline de processamento de linguagem natural em duas fases (ADR 008 e 009):
+Implementa pipeline de processamento de linguagem natural em duas fases (ADR-06):
 1. Descoberta não-supervisionada de taxonomia de detração via LLM (Topic Discovery).
 2. Classificação semântica em lote com validação estrita de schema (Pydantic / Structured Output).
 3. Persistência relacional dos atributos enriquecidos na tabela 'fato_reviews_classificados' do DuckDB.
@@ -245,7 +245,7 @@ def classify_reviews_batch(client, model: str, reviews_data: list[dict[str, any]
             logger.warning(f"Erro no processamento do lote {i // batch_size + 1}: {e}. Marcando lote como não classificado...")
             # Atribuir uma categoria da taxonomia a um lote que falhou seria pior do que não
             # classificar: os registros entrariam na distribuição como se fossem inferência.
-            # Marcados assim, ficam identificáveis e são filtrados nas análises (ADR 015).
+            # Marcados assim, ficam identificáveis e são filtrados nas análises (ADR-06).
             falhas_no_lote += len(batch)
             for item in batch:
                 comentario = item['review_comment_message'].lower()
@@ -281,7 +281,7 @@ def persist_classifications_to_duckdb(classifications: list[ReviewClassification
     # A tabela é recriada a cada execução, não acumulada: a taxonomia é redescoberta na
     # Fase 1, então rodadas diferentes geram rótulos distintos para o mesmo conceito e
     # misturá-las produziria uma média de taxonomias incompatíveis. O run_id rastreia qual
-    # execução gerou cada linha (ADR 015).
+    # execução gerou cada linha (ADR-06).
     conn.execute("DROP TABLE IF EXISTS fato_reviews_classificados")
     conn.execute("""
         CREATE TABLE fato_reviews_classificados (

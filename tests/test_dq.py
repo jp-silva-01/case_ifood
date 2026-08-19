@@ -34,7 +34,7 @@ def test_chave_duplicada_vai_para_quarentena(tmp_path):
     assert (tmp_path / "quarantine_schema_customers.csv").exists()
 
 
-# --- Sinalização de outlier de preço (ADR 007) ---
+# --- Sinalização de outlier de preço (ADR-04) ---
 
 def test_outlier_de_preco_e_sinalizado_sem_ser_removido():
     """

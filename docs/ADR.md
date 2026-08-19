@@ -14,7 +14,6 @@ Este documento registra as decisões de arquitetura e modelagem tomadas na const
 | [04](#adr-04-detecção-de-outlier-de-preço-em-escala-logarítmica) | Detecção de outlier de preço em escala logarítmica | Aceito |
 | [05](#adr-05-engine-local-duckdb--sql-ingestão-com-fallback) | Engine local: DuckDB + SQL, ingestão com fallback | Aceito |
 | [06](#adr-06-escopo-e-desenho-do-módulo-de-ia) | Escopo e desenho do módulo de IA | Aceito |
-| [07](#adr-07-base-temporal-e-dimensionamento-das-alavancas) | Base temporal e dimensionamento das alavancas | Aceito |
 
 ---
 

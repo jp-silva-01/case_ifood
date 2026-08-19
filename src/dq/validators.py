@@ -4,9 +4,9 @@ Módulo de Qualidade de Dados e Validações Estatísticas (Data Quality)
 Implementa validação declarativa de schemas e regras de negócio com Pandera:
 1. Validação estrutural de tipos, não-nulidade e unicidade de chaves primárias.
 2. Checagens de consistência temporal e regras de domínio (ex: parcelamento de boleto).
-3. Sinalização de outliers de preço adaptada à distribuição dos dados (ADR 007).
+3. Sinalização de outliers de preço adaptada à distribuição dos dados (ADR-04).
 4. Validação de integridade referencial entre entidades relacionais.
-5. Política de soft fail com segregação física na Quarentena (ADR 003 e 005).
+5. Política de soft fail com segregação física na Quarentena (ADR-03).
 6. Auditoria de anomalias resolvidas na modelagem, reportadas sem descarte.
 """
 
@@ -100,7 +100,7 @@ def flag_price_outliers(df: pd.DataFrame, price_col: str = "price") -> tuple[pd.
     comercial legítima. O chaveamento usa assimetria em vez de teste de normalidade: com
     dezenas de milhares de linhas, o teste rejeita normalidade em qualquer cenário.
 
-    Racional completo na ADR 007. Retorna o DataFrame com a coluna e um dicionário de métricas.
+    Racional completo na ADR-04. Retorna o DataFrame com a coluna e um dicionário de métricas.
     """
     import numpy as np
 
@@ -248,7 +248,7 @@ def audit_soft_anomalies(df_orders: pd.DataFrame, df_products: pd.DataFrame, df_
         {
             "regra": "Avaliações duplicadas para o mesmo pedido",
             "ocorrencias": dup_reviews,
-            "tratamento": "Desempate pela avaliação mais recente na fato_pedidos (ADR 014)",
+            "tratamento": "Desempate pela avaliação mais recente na fato_pedidos (ADR-02)",
         },
         {
             "regra": "Pedidos com notas de avaliação divergentes entre si",
@@ -348,7 +348,7 @@ def run_dq_pipeline(raw_dir: str = "data/raw", staging_dir: str = "data/staging"
         df_items_clean, rel, fail, tot = validate_dataframe(OrderItemSchema, df_items, "Fato_Itens", "items.csv", quarantine_dir)
         metrics["Fato_Itens (Schema)"] = {'total': tot, 'failed': fail, 'reliability': rel}
 
-        # Sinalizacao, nao descarte (ADR 007).
+        # Sinalizacao, nao descarte (ADR-04).
         df_items_clean, outlier_stats = flag_price_outliers(df_items_clean)
 
         df_payments_clean, rel, fail, tot = validate_dataframe(PaymentSchema, df_payments, "Fato_Pagamentos", "payments.csv", quarantine_dir)

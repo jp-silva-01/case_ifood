@@ -31,7 +31,7 @@ Inconsistências reais do dataset que são resolvidas na modelagem em vez de ger
 | Anomalia Detectada | Ocorrências | Tratamento Aplicado |
 | :--- | ---: | :--- |
 | Itens com preço atípico — IQR 3x sobre ln(price) (assimetria=7.92) | 3 | Sinalizados com is_price_outlier acima de R$ 5,213.50; mantidos na fato_itens para não distorcer o GMV |
-| Avaliações duplicadas para o mesmo pedido | 551 | Desempate pela avaliação mais recente na fato_pedidos (ADR 014) |
+| Avaliações duplicadas para o mesmo pedido | 551 | Desempate pela avaliação mais recente na fato_pedidos (ADR-02) |
 | Pedidos com notas de avaliação divergentes entre si | 202 | Prevalece a avaliação mais recente; nota e comentário vêm da mesma linha |
 | Pedidos com status 'delivered' sem data de entrega | 8 | Mantidos na fato_pedidos; excluídos das métricas de prazo por serem NULL |
 | Produtos sem categoria cadastrada | 610 | Normalizados como 'unknown' na dim_produto via COALESCE |

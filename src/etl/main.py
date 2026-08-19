@@ -2,9 +2,9 @@
 Módulo Principal de Orquestração (Pipeline ETL/ELT)
 
 Responsável pelo fluxo do projeto:
-1. Ingestão híbrida dos dados brutos (KaggleHub com fallback local - ADR 006).
-2. Validação e saneamento na camada Staging com política de soft fail (ADR 003 e 005).
-3. Execução das transformações para estruturação do Star Schema no DuckDB (ADR 004).
+1. Ingestão híbrida dos dados brutos (KaggleHub com fallback local - ADR-05).
+2. Validação e saneamento na camada Staging com política de soft fail (ADR-03).
+3. Execução das transformações para estruturação do Star Schema no DuckDB (ADR-01 e ADR-05).
 """
 
 import duckdb
